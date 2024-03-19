@@ -109,3 +109,22 @@ class test_fileStorage(unittest.TestCase):
         from models.engine.file_storage import FileStorage
         print(type(storage))
         self.assertEqual(type(storage), FileStorage)
+
+    def test_delete_existing_object(self):
+        # Test deleting an existing object
+        self.assertIn("BaseModel.1", self.storage.all())
+        self.storage.delete(self.obj1)
+        self.assertNotIn("BaseModel.1", self.storage.all())
+
+    def test_delete_nonexistent_object(self):
+        # Test deleting a nonexistent object
+        obj3 = BaseModel(id="3")
+        self.assertNotIn("BaseModel.3", self.storage.all())
+        self.storage.delete(obj3)
+        self.assertNotIn("BaseModel.3", self.storage.all())
+
+    def test_delete_no_object(self):
+        # Test deleting with no object provided
+        initial_objects = dict(self.storage.all())
+        self.storage.delete()
+        self.assertDictEqual(initial_objects, self.storage.all())
