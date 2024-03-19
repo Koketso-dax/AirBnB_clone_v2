@@ -11,10 +11,12 @@ time_fmt = "%Y-%m-%dT%H:%M:%S.%f"
 
 Base = declarative_base() if getenv("HBNB_TYPE_STORAGE") == 'db' else object
 
+
 class BaseModel(Base):
     """The BaseModel class from which future classes will be derived"""
 
-    __tablename__ = 'base_model' if getenv("HBNB_TYPE_STORAGE") == 'db' else None
+    __tablename__ = 'base_model' if getenv(
+        "HBNB_TYPE_STORAGE") == 'db' else None
 
     if getenv("HBNB_TYPE_STORAGE") == 'db':
         id = Column(String(60), nullable=False, primary_key=True)
@@ -33,9 +35,11 @@ class BaseModel(Base):
                 if key != '__class__':
                     setattr(self, key, value)
                     if isinstance(self.created_at, str):
-                        self.created_at = datetime.strptime(self.created_at, time_fmt)
+                        self.created_at = datetime.strptime(
+                            self.created_at, time_fmt)
                     if isinstance(self.updated_at, str):
-                        self.updated_at = datetime.strptime(self.updated_at, time_fmt)
+                        self.updated_at = datetime.strptime(
+                            self.updated_at, time_fmt)
 
     def __str__(self):
         """String representation of the BaseModel class"""

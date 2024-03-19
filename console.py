@@ -19,16 +19,16 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
-               'BaseModel': BaseModel, 'User': User, 'Place': Place,
-               'State': State, 'City': City, 'Amenity': Amenity,
-               'Review': Review
-              }
+        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
+    }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
-            }
+        'number_rooms': int, 'number_bathrooms': int,
+        'max_guest': int, 'price_by_night': int,
+        'latitude': float, 'longitude': float
+    }
 
     def preloop(self):
         """Prints if isatty is false"""
@@ -112,45 +112,6 @@ class HBNBCommand(cmd.Cmd):
     def emptyline(self):
         """ Overrides the emptyline method of CMD """
         pass
-
-    def do_create(self, args):
-        """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        arg = args.split()
-        class_name = arg[0]
-        if args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
-        params = {}
-        for param in args[1:]:
-            if '=' in param:
-                key, value = param.split('=')
-                if value.startswith('"') and value.endswith('"'):
-                    # String value
-                    value = value[1:-1].replace('_', ' ').replace('\\"', '"')
-                elif '.' in value:
-                    # Float value
-                    try:
-                        value = float(value)
-                    except ValueError:
-                        print(f"Invalid float arg '{key}': '{value}'")
-                        continue
-                else:
-                    # Integer value
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        print(f"Invalid integer arg '{key}': '{value}'")
-                        continue
-                params[key] = value
-            else:
-                print(f"Skipping invalid args : '{param}'")
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -345,6 +306,57 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
+    def do_create(self, args):
+        """Create an object of any class"""
+        class_name_pattern = (
+                r'(?P<class_name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
+                )
+        param_pattern = (r'(?P<param>\w+)='
+                         r'(('
+                         r'(?P<t_str>"([^"]|\")*")|'
+                         r'(?P<t_float>[-+]?\d+\.\d+)|'
+                         r'(?P<t_int>[-+]?\d+)'
+                         r'))'
+                         )
+        class_match = re.match(class_name_pattern, args)
+        if not class_match:
+            print("** class name missing **")
+            return
+
+        class_name = class_match.group('class_name')
+        if class_name not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
+
+        obj_kwargs = {}
+        param_matches = re.finditer(
+            param_pattern, args[len(class_name):].strip())
+        for match in param_matches:
+            key_name = match.group('param')
+            str_v = match.group('t_str')
+            float_v = match.group('t_float')
+            int_v = match.group('t_int')
+            if str_v is not None:
+                obj_kwargs[key_name] = str_v[1:-1].replace('_', ' ')
+            elif float_v is not None:
+                obj_kwargs[key_name] = float(float_v)
+            elif int_v is not None:
+                obj_kwargs[key_name] = int(int_v)
+
+        new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
+        if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+            if not hasattr(new_instance, 'id'):
+                new_instance.id = str(uuid.uuid4())
+            if not hasattr(new_instance, 'created_at'):
+                new_instance.created_at = datetime.now()
+            if not hasattr(new_instance, 'updated_at'):
+                new_instance.updated_at = datetime.now()
+            new_instance.save()
+        else:
+            new_instance.save()
+
+        print(new_instance.id)
 
 
 if __name__ == "__main__":

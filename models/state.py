@@ -5,6 +5,7 @@ from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
 
+
 class State(BaseModel, Base):
     """Representation of state """
     if getenv('HBNB_TYPE_STORAGE') == 'db':
@@ -23,5 +24,6 @@ class State(BaseModel, Base):
         def cities(self):
             """Getter attribute that returns City instances"""
             values_city = models.storage.all("City").values()
-            list_city = [city for city in values_city if city.state_id == self.id]
+            list_city = [
+                city for city in values_city if city.state_id == self.id]
             return list_city

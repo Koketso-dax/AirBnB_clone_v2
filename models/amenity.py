@@ -4,6 +4,7 @@ from os import getenv
 from sqlalchemy import Column, String
 from models.base_model import BaseModel, Base
 
+
 class Amenity(BaseModel, Base):
     """Representation of Amenity """
     if getenv('HBNB_TYPE_STORAGE') == 'db':
