@@ -35,7 +35,8 @@ class DBStorage:
                 key = "{}.{}".format(type(obj).__name__, obj.id)
                 objs[key] = obj
         else:
-            for class_name in ["User", "State", "City", "Amenity", "Place", "Review"]:
+            for class_name in ["User", "State", "City",
+                               "Amenity", "Place", "Review"]:
                 query = self.__session.query(eval(class_name)).all()
                 for obj in query:
                     key = "{}.{}".format(type(obj).__name__, obj.id)
@@ -58,7 +59,7 @@ class DBStorage:
     def reload(self):
         """ Create all tables in the database and create the session """
         Base.metadata.create_all(self.__engine)
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        session_factory = sessionmaker(bind=self.__engine,
+                                       expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
-

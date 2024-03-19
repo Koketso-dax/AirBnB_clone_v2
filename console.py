@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -120,10 +120,10 @@ class HBNBCommand(cmd.Cmd):
             return
         arg = args.split()
         class_name = arg[0]
-        elif args not in HBNBCommand.classes:
+        if args not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        params={}
+        params = {}
         for param in args[1:]:
             if '=' in param:
                 key, value = param.split('=')
@@ -135,18 +135,18 @@ class HBNBCommand(cmd.Cmd):
                     try:
                         value = float(value)
                     except ValueError:
-                        print(f"Invalid float value for parameter '{key}': '{value}'")
+                        print(f"Invalid float arg '{key}': '{value}'")
                         continue
                 else:
                     # Integer value
                     try:
                         value = int(value)
                     except ValueError:
-                        print(f"Invalid integer value for parameter '{key}': '{value}'")
+                        print(f"Invalid integer arg '{key}': '{value}'")
                         continue
                 params[key] = value
             else:
-                print(f"Skipping invalid parameter format: '{param}'")
+                print(f"Skipping invalid args : '{param}'")
         new_instance = HBNBCommand.classes[args]()
         storage.save()
         print(new_instance.id)
@@ -213,7 +213,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -345,6 +345,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
