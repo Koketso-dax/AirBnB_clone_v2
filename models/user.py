@@ -2,7 +2,7 @@
 """User class module"""
 from os import getenv
 from hashlib import md5
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from models.base_model import BaseModel, Base
 
@@ -19,6 +19,7 @@ class User(BaseModel, Base):
                               cascade="all, delete-orphan")
         reviews = relationship("Review", backref="user",
                                cascade="all, delete-orphan")
+        id = Column(String(60), ForeignKey('BaseModel.id'))
     else:
         email = ""
         _password = ""

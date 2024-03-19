@@ -2,6 +2,8 @@
 """ Console Module """
 import cmd
 import sys
+import re
+import os
 from models.base_model import BaseModel
 from models.__init__ import storage
 from models.user import User
@@ -308,56 +310,63 @@ class HBNBCommand(cmd.Cmd):
         print("Usage: update <className> <id> <attName> <attVal>\n")
 
     def do_create(self, args):
-        """Create an object of any class"""
-        class_name_pattern = (
-                r'(?P<class_name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
-                )
-        param_pattern = (r'(?P<param>\w+)='
-                         r'(('
-                         r'(?P<t_str>"([^"]|\")*")|'
-                         r'(?P<t_float>[-+]?\d+\.\d+)|'
-                         r'(?P<t_int>[-+]?\d+)'
-                         r'))'
-                         )
-        class_match = re.match(class_name_pattern, args)
-        if not class_match:
+        """ Create an object of any class"""
+        ignored_attrs = ('id', 'created_at', 'updated_at', '__class__')
+        class_name = ''
+        name_pattern = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
+        class_match = re.match(name_pattern, args)
+        obj_kwargs = {}
+        if class_match is not None:
+            class_name = class_match.group('name')
+            params_str = args[len(class_name):].strip()
+            params = params_str.split(' ')
+            str_pattern = r'(?P<t_str>"([^"]|\")*")'
+            float_pattern = r'(?P<t_float>[-+]?\d+\.\d+)'
+            int_pattern = r'(?P<t_int>[-+]?\d+)'
+            param_pattern = '{}=({}|{}|{})'.format(
+                name_pattern,
+                str_pattern,
+                float_pattern,
+                int_pattern
+            )
+            for param in params:
+                param_match = re.fullmatch(param_pattern, param)
+                if param_match is not None:
+                    key_name = param_match.group('name')
+                    str_v = param_match.group('t_str')
+                    float_v = param_match.group('t_float')
+                    int_v = param_match.group('t_int')
+                    if float_v is not None:
+                        obj_kwargs[key_name] = float(float_v)
+                    if int_v is not None:
+                        obj_kwargs[key_name] = int(int_v)
+                    if str_v is not None:
+                        obj_kwargs[key_name] = str_v[1:-1].replace('_', ' ')
+        else:
+            class_name = args
+        if not class_name:
             print("** class name missing **")
             return
-
-        class_name = class_match.group('class_name')
-        if class_name not in HBNBCommand.classes:
+        elif class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        obj_kwargs = {}
-        param_matches = re.finditer(
-            param_pattern, args[len(class_name):].strip())
-        for match in param_matches:
-            key_name = match.group('param')
-            str_v = match.group('t_str')
-            float_v = match.group('t_float')
-            int_v = match.group('t_int')
-            if str_v is not None:
-                obj_kwargs[key_name] = str_v[1:-1].replace('_', ' ')
-            elif float_v is not None:
-                obj_kwargs[key_name] = float(float_v)
-            elif int_v is not None:
-                obj_kwargs[key_name] = int(int_v)
-
-        new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
         if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-            if not hasattr(new_instance, 'id'):
-                new_instance.id = str(uuid.uuid4())
-            if not hasattr(new_instance, 'created_at'):
-                new_instance.created_at = datetime.now()
-            if not hasattr(new_instance, 'updated_at'):
-                new_instance.updated_at = datetime.now()
+            if not hasattr(obj_kwargs, 'id'):
+                obj_kwargs['id'] = str(uuid.uuid4())
+            if not hasattr(obj_kwargs, 'created_at'):
+                obj_kwargs['created_at'] = str(datetime.now())
+            if not hasattr(obj_kwargs, 'updated_at'):
+                obj_kwargs['updated_at'] = str(datetime.now())
+            new_instance = HBNBCommand.classes[class_name](**obj_kwargs)
             new_instance.save()
+            print(new_instance.id)
         else:
+            new_instance = HBNBCommand.classes[class_name]()
+            for key, value in obj_kwargs.items():
+                if key not in ignored_attrs:
+                    setattr(new_instance, key, value)
             new_instance.save()
-
-        print(new_instance.id)
-
+            print(new_instance.id)
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
