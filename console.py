@@ -5,7 +5,7 @@ import sys
 import re
 import os
 from models.base_model import BaseModel
-from models.__init__ import storage
+import models.storage as storage
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -367,6 +367,7 @@ class HBNBCommand(cmd.Cmd):
                     setattr(new_instance, key, value)
             new_instance.save()
             print(new_instance.id)
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
