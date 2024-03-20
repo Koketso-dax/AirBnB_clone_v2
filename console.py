@@ -15,6 +15,7 @@ from models.review import Review
 import uuid
 from datetime import datetime
 
+
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
 
