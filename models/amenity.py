@@ -1,5 +1,5 @@
 #!/usr/bin/python
-""" holds class Amenity"""
+""" Amenity class module """
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
@@ -9,7 +9,21 @@ from sqlalchemy.orm import relationship
 
 
 class Amenity(BaseModel, Base):
-    """Representation of Amenity """
+    """
+    Amenity Class implementation.
+
+    Attributes:
+
+        __tablename__ (str): SQL tablename value: amenities.
+        name (str): Amenity field name.
+
+    Methods:
+        - __init__: initializes obj by calling super constructor.
+
+    Inherits from:
+        BaseModel: Super class for all data in HBNB Clone.
+        Base: Declarative base for SQLAlchemy.
+    """
     if models.storage_t == 'db':
         __tablename__ = 'amenities'
         name = Column(String(128), nullable=False)
@@ -17,5 +31,12 @@ class Amenity(BaseModel, Base):
         name = ""
 
     def __init__(self, *args, **kwargs):
-        """initializes Amenity"""
+        """
+        Initializes Amenity instance.
+
+        Args:
+
+        *args (list): argument list.
+        **kwargs (dict): keyword args.
+        """
         super().__init__(*args, **kwargs)

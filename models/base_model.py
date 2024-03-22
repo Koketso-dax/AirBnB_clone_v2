@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-Contains class BaseModel
+BaseModel Class module.
 """
 from datetime import datetime
 import models
@@ -18,7 +18,21 @@ else:
 
 
 class BaseModel:
-    """The BaseModel class from which future classes will be derived"""
+    """
+    The BaseModel class from which future classes will be derived.
+
+    Attributes:
+        id (str): Instance unique identifier.
+        created_at (datetime.datetime): Date and time of obj creation.
+        updated_at (datetime.datetime): Date and time of most recent modification.
+
+    Methods:
+        - __init__: Initializes obj by calling super.
+        - __str__: Returns str representaion of obj.
+        - save: Saves / update the object using selected storage.
+        - to_dict: Return dictionary representation of obj.
+        - delete: Deletes object from the storage.
+    """
     if getenv("HBNB_TYPE_STORAGE") == 'db':
         id = Column(String(60), nullable=False, primary_key=True)
         created_at = Column(DateTime, nullable=False, default=datetime.utcnow)

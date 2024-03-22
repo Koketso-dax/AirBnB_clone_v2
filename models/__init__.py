@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 """
-initialize the models storage
+initialize the models storage according to env.
 """
 
 from os import getenv

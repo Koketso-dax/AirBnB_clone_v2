@@ -1,5 +1,7 @@
 #!/usr/bin/python
-""" holds class Place"""
+"""
+Place Class Module.
+"""
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
@@ -20,7 +22,15 @@ if models.storage_t == 'db':
 
 
 class Place(BaseModel, Base):
-    """Representation of Place """
+    """
+    Place Class implementation.
+
+    Attributes:
+        __tablename__ (str): SQL db table name (places).
+        city_id (str): City identifier (max 60 chars).
+        user_id (str): User identifier key (max 60 chars).
+        name (str): Place name (max 128 chars).
+    """
     if models.storage_t == 'db':
         __tablename__ = 'places'
         city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
