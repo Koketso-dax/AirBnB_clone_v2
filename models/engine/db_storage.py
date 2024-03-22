@@ -74,3 +74,13 @@ class DBStorage:
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
+
+    def exec_query(self, query):
+        """Exercute an SQL query"""
+        try:
+            result = self.__session.execute(query)
+            self.__session.commit()
+            return result
+        except Exception as e:
+            print("Error executing SQL query or command:", e)
+            return None

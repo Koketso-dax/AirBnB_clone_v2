@@ -2,6 +2,7 @@
 """ console """
 
 import cmd
+import sys
 from datetime import datetime
 import models
 from models.amenity import Amenity
@@ -20,6 +21,16 @@ classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
 class HBNBCommand(cmd.Cmd):
     """ HBNH console """
     prompt = '(hbnb) '
+
+    def cmdloop_with_input(self, intro=None):
+        if intro is not None:
+            sys.stdout.write("%s\n" % str(intro))
+        while True:
+            try:
+                line = input(self.prompt)
+            except EOFError:
+                line = 'exit'
+            self.onecmd(line)
 
     def do_EOF(self, arg):
         """Exits console"""
