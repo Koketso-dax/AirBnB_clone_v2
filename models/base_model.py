@@ -23,8 +23,8 @@ class BaseModel:
 
     Attributes:
         id (str): Instance unique identifier.
-        created_at (datetime.datetime): Date and time of obj creation.
-        updated_at (datetime.datetime): Date and time of most recent modification.
+        created_at (datetime.datetime): Date time of obj creation.
+        updated_at (datetime.datetime): Date time of most recent modification.
 
     Methods:
         - __init__: Initializes obj by calling super.

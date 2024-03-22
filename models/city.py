@@ -19,10 +19,10 @@ class City(BaseModel, Base):
         state_id (str): State identifier.
         name (str): State name.
         places (sqlalchemy.orm.relationship): Places -> Cities relationship.
-    
+
     Methods:
         - __init__: Initializes obj by calling super.
-    
+
     Inherits from:
         BaseModel: Base class for HBNB Clone objects.
         Base: Declarative base for SQLAlchemy table.
