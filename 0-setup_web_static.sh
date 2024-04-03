@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
 # Install Nginx if not already installed
-if ! dpkg -l | grep nginx > /dev/null; then
-    sudo apt-get update
-    sudo apt-get -y install nginx
-fi
+sudo apt-get update
+sudo apt-get -y install nginx
 
 # Create necessary directories
 sudo mkdir -p /data/web_static/releases/test
@@ -27,6 +25,25 @@ nginx_config_backup="/etc/nginx/sites-enabled/default.bak"
 if [ ! -f "$nginx_config_backup" ]; then
     sudo cp "$nginx_config" "$nginx_config_backup"
 fi
+
+sudo bash -c 'echo "server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name koketsodiale.tech www.koketsodiale.tech;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+
+    location /hbnb_static {
+        alias /data/web_static/current/;
+    }
+}" > "$nginx_config"'
+
 sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/; }' "$nginx_config"
 
 # Restart Nginx
