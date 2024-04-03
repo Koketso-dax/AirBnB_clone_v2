@@ -12,47 +12,24 @@ env.key_filename = '~/.ssh/id_rsa'
 
 
 def do_deploy(archive_path):
-    """Deploy web files to server
-    """
+    """Distributes an archive to your web servers"""
+    if not exists(archive_path):
+        return False
+
     try:
-        if not (path.exists(archive_path)):
-            return False
+        archive_name = archive_path.split("/")[-1]
+        archive_folder = "/data/web_static/releases/{}".format(
+            archive_name.split(".")[0])
 
-        # upload archive
-        put(archive_path, '/tmp/')
-
-        # create target dir
-        timestamp = archive_path[-18:-4]
-        run('sudo mkdir -p /data/web_static/\
-            releases/web_static_{}/'.format(timestamp))
-
-        # uncompress archive and delete .tgz
-        run('sudo tar -xzf /tmp/web_static_{}.tgz -C \
-            /data/web_static/releases/web_static_{}/'
-            .format(timestamp, timestamp))
-
-        # remove archive
-        run('sudo rm /tmp/web_static_{}.tgz'.format(timestamp))
-
-        # move contents into host web_static
-        run('sudo mv /data/web_static/releases/web_static_{}/web_static/*\
-            /data/web_static/releases/web_static_{}/'
-            .format(timestamp, timestamp))
-
-        # remove extraneous web_static dir
-        run('sudo rm -rf /data/web_static/releases/\
-            web_static_{}/web_static'
-            .format(timestamp))
-
-        # delete pre-existing sym link
-        run('sudo rm -rf /data/web_static/current')
-
-        # re-establish symbolic link
-        run('sudo ln -s /data/web_static/releases/\
-            web_static_{}/ /data/web_static/current'.format(timestamp))
+        put(archive_path, "/tmp/")
+        run("sudo mkdir -p {}".format(archive_folder))
+        run("sudo tar -xzf /tmp/{} -C {}".format(archive_name, archive_folder))
+        run("sudo rm /tmp/{}".format(archive_name))
+        run("sudo mv {}/web_static/* {}".format(archive_folder, archive_folder))
+        run("sudo rm -rf {}/web_static".format(archive_folder))
+        run("sudo rm -rf /data/web_static/current")
+        run("sudo ln -s {} /data/web_static/current".format(archive_folder))
+        return True
 
     except Exception as e:
-        print(str(e))
         return False
-    # return True on success
-    return True
