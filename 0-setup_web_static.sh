@@ -4,9 +4,11 @@ sudo apt-get update
 sudo apt-get -y install nginx
 
 # Create necessary directories
-sudo mkdir -p /data/web_static/releases/test
-sudo mkdir -p /data/web_static/shared
-sudo mkdir -p /data/web_static/current
+sudo mkdir -p /data/
+sudo mkdir -p /data/web_static/
+sudo mkdir -p /data/web_static/releases/
+sudo mkdir -p /data/web_static/shared/
+sudo mkdir -p /data/web_static/releases/test/
 
 # Create a fake HTML file
 sudo touch /data/web_static/releases/test/index.html
@@ -23,14 +25,7 @@ sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
 # Set ownership recursively to ubuntu user and group
 sudo chown -R ubuntu:ubuntu /data/
 
-# Update Nginx configuration to serve content to hbnb_static
-nginx_config="/etc/nginx/sites-enabled/default"
-nginx_config_backup="/etc/nginx/sites-enabled/default.bak"
-if [ ! -f "$nginx_config_backup" ]; then
-    sudo cp "$nginx_config" "$nginx_config_backup"
-fi
-
-sudo bash -c 'cat > $nginx_config' << EOF
+sudo bash -c 'cat > /etc/nginx/sites-available/default' << EOF
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
@@ -38,7 +33,9 @@ server {
     root /var/www/html;
     index index.html index.htm index.nginx-debian.html;
 
-    server_name koketsodiale.tech www.koketsodiale.tech;
+    server_name _;
+
+    add_header X-Served-By \$hostname;
 
     location / {
         try_files \$uri \$uri/ =404;
@@ -50,7 +47,29 @@ server {
 }
 EOF
 
-sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/; }' "$nginx_config"
+sudo bash -c 'cat > /etc/nginx/sites-enabled/default' << EOF
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+
+    server_name _;
+
+    add_header X-Served-By \$hostname;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+
+    location /hbnb_static {
+        alias /data/web_static/current/;
+    }
+}
+EOF
+
+sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/; }' "/etc/nginx/sites-enabled/default"
 
 # Restart Nginx
 sudo service nginx restart
