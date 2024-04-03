@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install Nginx if not already installed
 sudo apt-get update
-sudo apt-get -y install nginx
+sudo apt-get install nginx -y
 
 # Create necessary directories
 sudo mkdir -p /data/
@@ -47,28 +47,7 @@ server {
 }
 EOF
 
-sudo bash -c 'cat > /etc/nginx/sites-enabled/default' << EOF
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-
-    root /var/www/html;
-    index index.html index.htm index.nginx-debian.html;
-
-    server_name _;
-
-    add_header X-Served-By \$hostname;
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-
-    location /hbnb_static {
-        alias /data/web_static/current/;
-    }
-}
-EOF
-
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/; }' "/etc/nginx/sites-enabled/default"
 
 # Restart Nginx
