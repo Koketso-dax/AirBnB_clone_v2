@@ -4,11 +4,11 @@ sudo apt-get update
 sudo apt-get install nginx -y
 sudo ufw allow 'Nginx HTTP'
 # Create necessary directories
-sudo mkdir -p /data/
-sudo mkdir -p /data/web_static/
-sudo mkdir -p /data/web_static/releases/
-sudo mkdir -p /data/web_static/shared/
-sudo mkdir -p /data/web_static/releases/test/
+sudo mkdir /data/
+sudo mkdir /data/web_static/
+sudo mkdir /data/web_static/shared/
+sudo mkdir /data/web_static/releases/
+sudo mkdir /data/web_static/releases/test/
 
 # Create a fake HTML file
 sudo bash -c 'cat > /data/web_static/releases/test/index.html' << EOF
@@ -54,4 +54,4 @@ EOF
 sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Restart Nginx
-sudo service nginx restart
+sudo nginx -s reload
