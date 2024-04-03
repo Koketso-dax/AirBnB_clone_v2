@@ -33,5 +33,5 @@ def do_deploy(archive_path):
         run("sudo ln -s {} /data/web_static/current".format(archive_folder))
         return True
 
-    except Exception as e:
+    except Exception:
         return False
