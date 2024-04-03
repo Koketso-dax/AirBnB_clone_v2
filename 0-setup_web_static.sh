@@ -11,8 +11,6 @@ sudo mkdir -p /data/web_static/shared/
 sudo mkdir -p /data/web_static/releases/test/
 
 # Create a fake HTML file
-sudo touch /data/web_static/releases/test/index.html
-
 sudo bash -c 'cat > /data/web_static/releases/test/index.html' << EOF
 <html>
 <head></head>
@@ -54,9 +52,6 @@ EOF
 
 # Create symbolic link to Nginx configuration file
 sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
-
-# Add location block to Nginx configuration file
-sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/; }' /etc/nginx/sites-enabled/default
 
 # Restart Nginx
 sudo service nginx restart
