@@ -4,7 +4,7 @@ starts a Flask web application
 """
 
 from flask import Flask, render_template
-from models import *
+from models.state import State
 from models import storage
 app = Flask(__name__)
 
@@ -16,8 +16,9 @@ def teardown_db(exception):
 @app.route('/states_list', strict_slashes=False)
 def states_list():
     """display a HTML page with the states listed in alphabetical order"""
-    states = sorted(list(storage.all("State").values()), key=lambda x: x.name)
-    return render_template('7-states_list.html', states=states)
+    states = storage.all(State)
+    state_list = list(states.values())
+    return render_template('7-states_list.html', states=state_list)
 
 
 if __name__ == '__main__':
