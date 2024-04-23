@@ -17,8 +17,8 @@ def teardown_db(exception):
 def states_list():
     """display a HTML page with the states listed in alphabetical order"""
     states = storage.all(State)
-    state_list = list(states.values())
-    return render_template('7-states_list.html', states=state_list)
+    states = list(states.values())
+    return render_template('7-states_list.html', states=states)
 
 
 if __name__ == '__main__':
